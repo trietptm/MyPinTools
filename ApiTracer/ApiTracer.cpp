@@ -317,6 +317,21 @@ VOID MonitorVsnsprintf(IMG Image, const char* funcName)
 	}
 }
 
+VOID MonitorCreateFileW(IMG Image, const char* funcName)
+{
+	RTN cfwRtn = RTN_FindByName(Image, funcName);
+	if (RTN_Valid(cfwRtn))
+	{
+		RTN_Open(cfwRtn);
+		RTN_InsertCall(cfwRtn, IPOINT_BEFORE, (AFUNPTR)LogFunction1WChar,
+			IARG_ADDRINT, funcName,
+			IARG_G_ARG0_CALLEE,
+			IARG_END
+			);
+		RTN_Close(cfwRtn);
+	}
+}
+
 VOID MonitorRegOpenKeyExW(IMG Image, const char* funcName)
 {
 	RTN cfwRtn = RTN_FindByName(Image, funcName);
@@ -379,6 +394,7 @@ VOID ImageLoad(IMG Image, VOID *v)
 	MonitorVsnsprintf(Image, "_vsnprintf");
 	MonitorRegOpenKeyExW(Image, "RegOpenKeyExW");
 	MonitorHttpSendRequestW(Image, "HttpSendRequestW");
+	MonitorCreateFileW(Image, "CreateFileW");
 }
 
 /*!
